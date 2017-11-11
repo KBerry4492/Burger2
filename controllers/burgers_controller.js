@@ -1,23 +1,22 @@
 var express = require("express");
-
+var db = require('../models');
+var moment = require('moment');
 var router = express.Router();
-
-// Import the model (burger.js) to use its database functions.
-var burger = require("../models/burger.js");
 
 // Create all our routes and set up logic within those routes where required.
 router.get("/", function(req, res) {
-  burger.all(function(data) {
-    var hbsObject = {
+  db.Burger.findAll({}).then((data) => {
+
+    var burgers = {
       burgers: data
     };
-    console.log(hbsObject);
-    res.render("index", hbsObject);
+
+    res.render("index", burgers);
   });
 });
 
 router.post("/api/burgers", function(req, res) {
-  burger.create([
+  db.Burger.create([
     "name", "eaten"
   ], [
     req.body.name, req.body.eaten
@@ -32,7 +31,7 @@ router.put("/api/burgers/:id", function(req, res) {
 
   console.log("condition", condition);
 
-  burger.update({
+  db.Burger.update({
     eaten: req.body.eaten
   }, condition, function(result) {
     if (result.changedRows == 0) {
